@@ -215,6 +215,9 @@ with tab3:
     if 'Date' in clean_data.columns:
         st.markdown("### Time Series Analysis")
         
+        # Add warning for users
+        st.info("ℹ️ To view the full time series analysis, please select **'All'** in the Age Group filter.")
+
         # Ensure Date is datetime and filter only numeric columns for summing
         time_data = filtered_data.copy()
         if not pd.api.types.is_datetime64_any_dtype(time_data['Date']):
