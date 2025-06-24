@@ -78,10 +78,16 @@ class DataProcessor:
         clean_data = self.clean_data()
         ml_data = clean_data.copy()
 
+        # Keep only rows with a valid target (do this before dropping columns)
+        for col in ['State', 'District', 'Update_Volume_Category']:
+            if col not in ml_data.columns:
+                raise KeyError(f"Column '{col}' not found in data. Cannot prepare ML data.")
+        ml_data = ml_data.dropna(subset=['State', 'District', 'Update_Volume_Category'])
+
         # Remove all columns directly related to the target
         drop_cols = [
-            'Bio_age_5_17', 'Bio_age_17+', 'Total_Updates', 'Update_Volume_Category',
-            'Updates_Per_Pincode', 'Pct_5_17', 'Pct_17+', 'Pincode_Count'
+            'Bio_age_5_17', 'Bio_age_17+', 'Total_Updates', 'Updates_Per_Pincode',
+            'Pct_5_17', 'Pct_17+', 'Pincode_Count'
         ]
         drop_cols = [col for col in drop_cols if col in ml_data.columns]
         ml_data = ml_data.drop(columns=drop_cols)
@@ -90,8 +96,5 @@ class DataProcessor:
         for col in ['State', 'District']:
             if col in ml_data.columns:
                 ml_data[col] = ml_data[col].astype('category').cat.codes
-
-        # Keep only rows with a valid target
-        ml_data = ml_data.dropna(subset=['State', 'District', 'Update_Volume_Category'])
 
         return ml_data
